@@ -1,8 +1,5 @@
 package com.archangel.skarest.domain;
 
-/**
- * Created by Mihael on 22.9.2017.
- */
 public class Greeting {
 
     private long counter;
