@@ -62,6 +62,12 @@
             <artifactId>gcloud-java-datastore</artifactId>
             <version>${cloud.datastore.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-api-1.0-sdk</artifactId>
+            <version>1.9.56</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

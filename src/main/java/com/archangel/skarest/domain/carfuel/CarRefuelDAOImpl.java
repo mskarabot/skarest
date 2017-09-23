@@ -28,7 +28,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 
     @Override
     public long create(CarRefuel carRefuel) {
-        Key key = keyFactory.newKey(ENTITY_NAME);
+        Key key = datastore.allocateId(keyFactory.newKey());
         Entity entityOut = map(carRefuel, key);
         datastore.put(entityOut);
         return key.id();
@@ -38,7 +38,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     public Batch.Response create(CarRefuelList carRefuelList) {
         Batch batch = datastore.newBatch();
         for (CarRefuel carRefuel : carRefuelList.getCarRefuels()) {
-            Key key = keyFactory.newKey(ENTITY_NAME);
+            Key key = datastore.allocateId(keyFactory.newKey());
             batch.put(map(carRefuel, key));
         }
         return batch.submit();
@@ -46,7 +46,19 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 
     @Override
     public void update(CarRefuel carRefuel) {
-        datastore.put(map(carRefuel, null));
+        Transaction transaction = datastore.newTransaction();
+        try {
+            Entity entitySource = transaction.get(keyFactory.newKey(carRefuel.getId()));
+            if (entitySource != null) {
+                Entity entityWrite = map(entitySource, carRefuel);
+                transaction.put(entityWrite);
+            }
+            transaction.commit();
+        } finally {
+            if (transaction.active()) {
+                transaction.rollback();
+            }
+        }
     }
 
 
@@ -58,10 +70,16 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 
 
     private Entity map(CarRefuel carRefuel, Key key) {
-        if (key == null) {
-            key = keyFactory.newKey(carRefuel.getId());
-        }
         return Entity.builder(key)
+                .set("fuelPricePerLiter", carRefuel.getFuelPricePerLiter())
+                .set("kilometers", carRefuel.getKilometers())
+                .set("liters", carRefuel.getLiters())
+                .set("totalPrice", carRefuel.getTotalPrice())
+                .build();
+    }
+
+    private Entity map(Entity entityFrom, CarRefuel carRefuel) {
+        return Entity.builder(entityFrom)
                 .set("fuelPricePerLiter", carRefuel.getFuelPricePerLiter())
                 .set("kilometers", carRefuel.getKilometers())
                 .set("liters", carRefuel.getLiters())
