@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Service
 public class CarRefuelDAOImpl implements CarRefuelDAO {
@@ -18,20 +20,29 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     @Autowired
     private Datastore datastore;
 
+    @Autowired
     private KeyFactory keyFactory;
-
-    @PostConstruct
-    public void initializeKeyFactories() {
-        log.info("Initializing key factories");
-        keyFactory = datastore.newKeyFactory().kind("CarRefuel");
-    }
+//
+//    @PostConstruct
+//    public void initializeKeyFactories() {
+//        log.info("Initializing key factories");
+//        keyFactory = datastore.newKeyFactory().kind(ENTITY_NAME);
+//    }
 
     @Override
     public long create(CarRefuel carRefuel) {
-        Key key = datastore.allocateId(keyFactory.newKey());
-        Entity entityOut = map(carRefuel, key);
-        datastore.put(entityOut);
-        return key.id();
+        Transaction transaction = datastore.newTransaction();
+        try {
+            Key key = datastore.allocateId(keyFactory.newKey());
+            Entity entityOut = map(carRefuel, key);
+            datastore.put(entityOut);
+            transaction.commit();
+            return key.id();
+        } finally {
+            if (transaction.active()) {
+                transaction.rollback();
+            }
+        }
     }
 
     @Override
@@ -61,9 +72,23 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         }
     }
 
+    @Override
+    public List<CarRefuel> list() {
+        Query<Entity> query =
+                Query.entityQueryBuilder().kind(ENTITY_NAME).orderBy(StructuredQuery.OrderBy.asc("id")).build();
+        Iterator<Entity> entitiesIterator = datastore.run(query);
+        ArrayList<CarRefuel> arrayList = new ArrayList();
+        while (entitiesIterator.hasNext()) {
+            Entity e = entitiesIterator.next();
+            CarRefuel carRefuel = map(e);
+            arrayList.add(carRefuel);
+        }
+        return arrayList;
+    }
+
 
     @Override
-    public void deleteUser(long id) {
+    public void delete(long id) {
         Key key = keyFactory.newKey(id);
         datastore.delete(key);
     }
@@ -85,6 +110,19 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
                 .set("liters", carRefuel.getLiters())
                 .set("totalPrice", carRefuel.getTotalPrice())
                 .build();
+    }
+
+    private CarRefuel map(Entity entityFrom) {
+        CarRefuel carRefuel = null;
+        if (entityFrom != null) {
+            carRefuel = new CarRefuel();
+            carRefuel.setId(entityFrom.key().id());
+            carRefuel.setFuelPricePerLiter(entityFrom.getLong("fuelPricePerLiter"));
+            carRefuel.setKilometers(entityFrom.getLong("kilometers"));
+            carRefuel.setLiters(entityFrom.getLong("liters"));
+            carRefuel.setTotalPrice(entityFrom.getLong("totalPrice"));
+        }
+        return carRefuel;
     }
 
 }

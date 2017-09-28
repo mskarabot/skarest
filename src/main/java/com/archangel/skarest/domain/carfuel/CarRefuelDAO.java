@@ -3,6 +3,8 @@ package com.archangel.skarest.domain.carfuel;
 
 import com.google.cloud.datastore.Batch;
 
+import java.util.List;
+
 public interface CarRefuelDAO {
 
     long create(CarRefuel carRefuel);
@@ -11,6 +13,8 @@ public interface CarRefuelDAO {
 
     void update(CarRefuel carRefuel);
 
-    void deleteUser(long id);
+    void delete(long id);
+
+    List<CarRefuel> list();
 
 }
