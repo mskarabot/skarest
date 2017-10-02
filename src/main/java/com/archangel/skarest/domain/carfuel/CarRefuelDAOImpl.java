@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,26 +21,18 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     @Autowired
     private Datastore datastore;
 
-    @Autowired
-    private KeyFactory keyFactory;
-//
-//    @PostConstruct
-//    public void initializeKeyFactories() {
-//        log.info("Initializing key factories");
-//        keyFactory = datastore.newKeyFactory().kind(ENTITY_NAME);
-//    }
-
     @Override
     public long create(CarRefuel carRefuel) {
         Transaction transaction = datastore.newTransaction();
+        KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_NAME);
         try {
             Key key = datastore.allocateId(keyFactory.newKey());
             Entity entityOut = map(carRefuel, key);
             datastore.put(entityOut);
             transaction.commit();
-            return key.id();
+            return key.getId();
         } finally {
-            if (transaction.active()) {
+            if (transaction.isActive()) {
                 transaction.rollback();
             }
         }
@@ -48,6 +41,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     @Override
     public Batch.Response create(CarRefuelList carRefuelList) {
         Batch batch = datastore.newBatch();
+        KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_NAME);
         for (CarRefuel carRefuel : carRefuelList.getCarRefuels()) {
             Key key = datastore.allocateId(keyFactory.newKey());
             batch.put(map(carRefuel, key));
@@ -59,6 +53,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     public void update(CarRefuel carRefuel) {
         Transaction transaction = datastore.newTransaction();
         try {
+            KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_NAME);
             Entity entitySource = transaction.get(keyFactory.newKey(carRefuel.getId()));
             if (entitySource != null) {
                 Entity entityWrite = map(entitySource, carRefuel);
@@ -66,7 +61,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
             }
             transaction.commit();
         } finally {
-            if (transaction.active()) {
+            if (transaction.isActive()) {
                 transaction.rollback();
             }
         }
@@ -75,7 +70,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     @Override
     public List<CarRefuel> list() {
         Query<Entity> query =
-                Query.entityQueryBuilder().kind(ENTITY_NAME).orderBy(StructuredQuery.OrderBy.asc("id")).build();
+                Query.newEntityQueryBuilder().setKind(ENTITY_NAME).build();
         Iterator<Entity> entitiesIterator = datastore.run(query);
         ArrayList<CarRefuel> arrayList = new ArrayList();
         while (entitiesIterator.hasNext()) {
@@ -89,13 +84,14 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 
     @Override
     public void delete(long id) {
+        KeyFactory keyFactory = datastore.newKeyFactory().setKind(ENTITY_NAME);
         Key key = keyFactory.newKey(id);
         datastore.delete(key);
     }
 
 
     private Entity map(CarRefuel carRefuel, Key key) {
-        return Entity.builder(key)
+        return Entity.newBuilder(key)
                 .set("fuelPricePerLiter", carRefuel.getFuelPricePerLiter())
                 .set("kilometers", carRefuel.getKilometers())
                 .set("liters", carRefuel.getLiters())
@@ -104,7 +100,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
     }
 
     private Entity map(Entity entityFrom, CarRefuel carRefuel) {
-        return Entity.builder(entityFrom)
+        return Entity.newBuilder(entityFrom)
                 .set("fuelPricePerLiter", carRefuel.getFuelPricePerLiter())
                 .set("kilometers", carRefuel.getKilometers())
                 .set("liters", carRefuel.getLiters())
@@ -116,7 +112,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         CarRefuel carRefuel = null;
         if (entityFrom != null) {
             carRefuel = new CarRefuel();
-            carRefuel.setId(entityFrom.key().id());
+            carRefuel.setId(entityFrom.getKey().getId());
             carRefuel.setFuelPricePerLiter(entityFrom.getLong("fuelPricePerLiter"));
             carRefuel.setKilometers(entityFrom.getLong("kilometers"));
             carRefuel.setLiters(entityFrom.getLong("liters"));
