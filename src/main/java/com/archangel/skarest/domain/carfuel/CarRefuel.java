@@ -19,6 +19,9 @@ public class CarRefuel {
     public static final String KILOMETERS = "kilometers";
     public static final String DESCRIPTION = "description";
 
+    public CarRefuel() {
+    }
+
     private CarRefuel(Builder builder) {
         this.id = builder.id;
         this.fuelPricePerLiter = builder.fuelPricePerLiter;

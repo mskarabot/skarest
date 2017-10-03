@@ -1,17 +1,18 @@
 package com.archangel.skarest.domain.carfuel;
 
 
+import com.archangel.skarest.domain.util.Result;
+
 public interface CarRefuelDAO {
 
-    Long createCarRefuel(CarRefuel carRefuel);
+    Long create(CarRefuel carRefuel);
 
-    CarRefuel readCarRefuel(Long id);
+    CarRefuel get(Long id);
 
-    void updateCarRefuel(CarRefuel carRefuel);
+    void update(CarRefuel carRefuel);
 
-    void deleteCarRefuel(Long id);
+    void delete(Long id);
 
-    Result<CarRefuel> listCarRefuel(String startCursorString);
-
+    Result<CarRefuel> find(String startCursorString, int limit);
 
 }

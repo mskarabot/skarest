@@ -1,5 +1,6 @@
 package com.archangel.skarest.domain.carfuel;
 
+import com.archangel.skarest.domain.util.Result;
 import com.google.appengine.api.datastore.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +18,12 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 
     private final Logger log = LoggerFactory.getLogger(CarRefuelDAOImpl.class);
 
+    private DatastoreService datastoreService;
+
     @Autowired
-    private DatastoreService datastore;
+    public CarRefuelDAOImpl(DatastoreService datastoreService) {
+        this.datastoreService = datastoreService;
+    }
 
     private CarRefuel entityToCarRefule(Entity entity) {
         return new CarRefuel.Builder()
@@ -31,7 +36,7 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
                 .build();
     }
 
-    public Long createCarRefuel(CarRefuel carRefuel) {
+    public Long create(CarRefuel carRefuel) {
         Entity entity = new Entity(CAR_REFUEL_KIND);
         entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, carRefuel.getFuelPricePerLiter());
         entity.setProperty(CarRefuel.LITERS, carRefuel.getLiters());
@@ -39,20 +44,20 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         entity.setProperty(CarRefuel.KILOMETERS, carRefuel.getKilometers());
         entity.setProperty(CarRefuel.DESCRIPTION, carRefuel.getDescription());
 
-        Key key = datastore.put(entity);
+        Key key = datastoreService.put(entity);
         return key.getId();
     }
 
-    public CarRefuel readCarRefuel(Long id) {
+    public CarRefuel get(Long id) {
         try {
-            Entity entity = datastore.get(KeyFactory.createKey(CAR_REFUEL_KIND, id));
+            Entity entity = datastoreService.get(KeyFactory.createKey(CAR_REFUEL_KIND, id));
             return entityToCarRefule(entity);
         } catch (EntityNotFoundException e) {
             return null;
         }
     }
 
-    public void updateCarRefuel(CarRefuel carRefuel) {
+    public void update(CarRefuel carRefuel) {
         Key key = KeyFactory.createKey(CAR_REFUEL_KIND, carRefuel.getId());
         Entity entity = new Entity(key);
         entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, carRefuel.getFuelPricePerLiter());
@@ -61,12 +66,12 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         entity.setProperty(CarRefuel.KILOMETERS, carRefuel.getFuelPricePerLiter());
         entity.setProperty(CarRefuel.DESCRIPTION, carRefuel.getFuelPricePerLiter());
 
-        datastore.put(entity);
+        datastoreService.put(entity);
     }
 
-    public void deleteCarRefuel(Long id) {
+    public void delete(Long id) {
         Key key = KeyFactory.createKey(CAR_REFUEL_KIND, id);
-        datastore.delete(key);
+        datastoreService.delete(key);
     }
 
     private List<CarRefuel> entitiesToCarRefuels(Iterator<Entity> entityResults) {
@@ -77,23 +82,23 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         return results;
     }
 
-    public Result<CarRefuel> listCarRefuel(String startCursorString) {
-        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(10); // Only show 10 at a time
+    public Result<CarRefuel> find(String startCursorString, int limit) {
+        FetchOptions fetchOptions = FetchOptions.Builder.withLimit(limit); // Only show 10 at a time
         if (startCursorString != null && !startCursorString.equals("")) {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
         }
         Query query = new Query(CAR_REFUEL_KIND)
                 .addSort(CarRefuel.KILOMETERS, Query.SortDirection.ASCENDING);
-        PreparedQuery preparedQuery = datastore.prepare(query);
+        PreparedQuery preparedQuery = datastoreService.prepare(query);
         QueryResultIterator<Entity> entityResults = preparedQuery.asQueryResultIterator(fetchOptions);
 
         List<CarRefuel> results = entitiesToCarRefuels(entityResults);     // Retrieve and convert Entities
         Cursor cursor = entityResults.getCursor();              // Where to start next time
         if (cursor != null && results.size() == 10) {         // Are we paging? Save Cursor
             String cursorString = cursor.toWebSafeString();               // Cursors are WebSafe
-            return new Result<>(results, cursorString);
+            return new Result<>(results, cursorString, limit);
         } else {
-            return new Result<>(results);
+            return new Result<>(results, limit);
         }
     }
 
@@ -106,10 +111,10 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
 //                // Only for this user
 //                .setFilter(new Query.FilterPredicate(
 //                        Book.CREATED_BY_ID, Query.FilterOperator.EQUAL, userId))
-//                // a custom datastore index is required since you are filtering by one property
+//                // a custom datastoreService index is required since you are filtering by one property
 //                // but ordering by another
 //                .addSort(Book.TITLE, Query.SortDirection.ASCENDING);
-//        PreparedQuery preparedQuery = datastore.prepare(query);
+//        PreparedQuery preparedQuery = datastoreService.prepare(query);
 //        QueryResultIterator<Entity> results = preparedQuery.asQueryResultIterator(fetchOptions);
 //
 //        List<Book> resultBooks = entitiesToBooks(results);     // Retrieve and convert Entities
