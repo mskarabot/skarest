@@ -1,20 +1,17 @@
 package com.archangel.skarest.domain.carfuel;
 
 
-import com.google.cloud.datastore.Batch;
-
-import java.util.List;
-
 public interface CarRefuelDAO {
 
-    long create(CarRefuel carRefuel);
+    Long createCarRefuel(CarRefuel carRefuel);
 
-    Batch.Response create(CarRefuelList carRefuelList);
+    CarRefuel readCarRefuel(Long id);
 
-    void update(CarRefuel carRefuel);
+    void updateCarRefuel(CarRefuel carRefuel);
 
-    void delete(long id);
+    void deleteCarRefuel(Long id);
 
-    List<CarRefuel> list();
+    Result<CarRefuel> listCarRefuel(String startCursorString);
+
 
 }
