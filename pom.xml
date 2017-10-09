@@ -26,6 +26,9 @@
         <appengine.maven.plugin.version>1.9.57</appengine.maven.plugin.version>
         <app.id>ska-rest</app.id>
         <app.version>${project.version}</app.version>
+        <google.api.client.version>1.21.0</google.api.client.version>
+        <google.oauth.client.jetty.version>1.21.0</google.oauth.client.jetty.version>
+        <google.api.services.sheets>v4-rev485-1.21.0</google.api.services.sheets>
     </properties>
 
     <dependencies>
@@ -87,12 +90,29 @@
             <artifactId>spring-hateoas</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>${google.api.client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>${google.oauth.client.jetty.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-sheets</artifactId>
+            <version>${google.api.services.sheets}</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring.boot.version}</version>
