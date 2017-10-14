@@ -12,7 +12,6 @@ public class CarRefuel {
     private Long kilometers;
     private String description;
 
-    public static final String ID = "id";
     public static final String FUEL_PRICE_PER_LITER = "fuelPricePerLiter";
     public static final String LITERS = "liters";
     public static final String TOTAL_PRICE = "totalPrice";

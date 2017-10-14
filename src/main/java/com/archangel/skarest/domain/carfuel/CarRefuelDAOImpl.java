@@ -25,59 +25,46 @@ public class CarRefuelDAOImpl implements CarRefuelDAO {
         this.datastoreService = datastoreService;
     }
 
-    private CarRefuel entityToCarRefule(Entity entity) {
-        return new CarRefuel.Builder()
-                .id(entity.getKey().getId())
-                .fuelPricePerLiter((Long) entity.getProperty(CarRefuel.FUEL_PRICE_PER_LITER))
-                .liters((Long) entity.getProperty(CarRefuel.LITERS))
-                .totalPrice((Long) entity.getProperty(CarRefuel.TOTAL_PRICE))
-                .kilometers((Long) entity.getProperty(CarRefuel.KILOMETERS))
-                .description((String) entity.getProperty(CarRefuel.DESCRIPTION))
-                .build();
-    }
-
-    public Long create(CarRefuel carRefuel) {
+    public Long create(CarRefuel dto) {
         Entity entity = new Entity(CAR_REFUEL_KIND);
-        entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, carRefuel.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.LITERS, carRefuel.getLiters());
-        entity.setProperty(CarRefuel.TOTAL_PRICE, carRefuel.getTotalPrice());
-        entity.setProperty(CarRefuel.KILOMETERS, carRefuel.getKilometers());
-        entity.setProperty(CarRefuel.DESCRIPTION, carRefuel.getDescription());
-
+        entity = CarRefuelMapper.dtoToEntity(dto, entity);
         Key key = datastoreService.put(entity);
+        log.info("CarRefuel created", dto);
         return key.getId();
     }
 
     public CarRefuel get(Long id) {
         try {
             Entity entity = datastoreService.get(KeyFactory.createKey(CAR_REFUEL_KIND, id));
-            return entityToCarRefule(entity);
+            log.info("CarRefuel loaded", entity);
+            return CarRefuelMapper.entityToDto(entity);
         } catch (EntityNotFoundException e) {
             return null;
         }
     }
 
-    public void update(CarRefuel carRefuel) {
-        Key key = KeyFactory.createKey(CAR_REFUEL_KIND, carRefuel.getId());
+    public void update(CarRefuel dto) {
+        Key key = KeyFactory.createKey(CAR_REFUEL_KIND, dto.getId());
         Entity entity = new Entity(key);
-        entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, carRefuel.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.LITERS, carRefuel.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.TOTAL_PRICE, carRefuel.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.KILOMETERS, carRefuel.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.DESCRIPTION, carRefuel.getFuelPricePerLiter());
-
+        entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, dto.getFuelPricePerLiter());
+        entity.setProperty(CarRefuel.LITERS, dto.getFuelPricePerLiter());
+        entity.setProperty(CarRefuel.TOTAL_PRICE, dto.getFuelPricePerLiter());
+        entity.setProperty(CarRefuel.KILOMETERS, dto.getFuelPricePerLiter());
+        entity.setProperty(CarRefuel.DESCRIPTION, dto.getFuelPricePerLiter());
         datastoreService.put(entity);
+        log.info("CarRefuel updated", dto);
     }
 
     public void delete(Long id) {
         Key key = KeyFactory.createKey(CAR_REFUEL_KIND, id);
         datastoreService.delete(key);
+        log.info("CarRefuel deleted", id);
     }
 
     private List<CarRefuel> entitiesToCarRefuels(Iterator<Entity> entityResults) {
         List<CarRefuel> results = new ArrayList<>();
         while (entityResults.hasNext()) {  // We still have data
-            results.add(entityToCarRefule(entityResults.next()));      // Add the Book to the List
+            results.add(CarRefuelMapper.entityToDto(entityResults.next()));      // Add the Book to the List
         }
         return results;
     }

@@ -10,7 +10,10 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableAutoConfiguration
-@ComponentScan(basePackages = {"com.archangel.skarest.domain.carfuel", "com.archangel.skarest.service"})
+@ComponentScan(basePackages = {
+        "com.archangel.skarest.domain.carfuel",
+        "com.archangel.skarest.domain.qalearn",
+        "com.archangel.skarest.service"})
 public class SpringBootService {
 
     public static void main(String[] args) {

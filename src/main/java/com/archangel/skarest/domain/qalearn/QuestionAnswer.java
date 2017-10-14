@@ -14,7 +14,6 @@ public class QuestionAnswer {
     private Long numberOfAnsweredCorrect;
     private Long numberOfAnsweredWrong;
 
-    public static final String ID = "id";
     public static final String BOOK_CODE = "bookCode";
     public static final String CHAPTER_CODE = "chapterCode";
     public static final String QUESTION_CODE = "questionCode";

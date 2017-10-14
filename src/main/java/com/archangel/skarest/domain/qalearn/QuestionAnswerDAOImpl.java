@@ -1,6 +1,5 @@
 package com.archangel.skarest.domain.qalearn;
 
-import com.archangel.skarest.domain.carfuel.CarRefuel;
 import com.archangel.skarest.domain.util.Result;
 import com.google.appengine.api.datastore.*;
 import org.slf4j.Logger;
@@ -11,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import static com.archangel.skarest.domain.qalearn.QuestionAnswerMapper.dtoToEntity;
+import static com.archangel.skarest.domain.qalearn.QuestionAnswerMapper.entityToDto;
 
 @Service
 public class QuestionAnswerDAOImpl implements QuestionAnswerDAO {
@@ -26,35 +28,18 @@ public class QuestionAnswerDAOImpl implements QuestionAnswerDAO {
         this.datastoreService = datastoreService;
     }
 
-    private QuestionAnswer entityToDto(Entity entity) {
-        return new QuestionAnswer.Builder()
-                .id(entity.getKey().getId())
-                .bookCode((String)entity.getProperty(QuestionAnswer.BOOK_CODE))
-                .chapterCode((String)entity.getProperty(QuestionAnswer.CHAPTER_CODE))
-                .questionCode((String)entity.getProperty(QuestionAnswer.QUESTION_CODE))
-                .fuelPricePerLiter((Long) entity.getProperty(CarRefuel.FUEL_PRICE_PER_LITER))
-                .liters((Long) entity.getProperty(CarRefuel.LITERS))
-                .totalPrice((Long) entity.getProperty(CarRefuel.TOTAL_PRICE))
-                .kilometers((Long) entity.getProperty(CarRefuel.KILOMETERS))
-                .description((String) entity.getProperty(CarRefuel.DESCRIPTION))
-                .build();
-    }
-
     public Long create(QuestionAnswer dto) {
         Entity entity = new Entity(QA_KIND);
-        entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, dto.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.LITERS, dto.getLiters());
-        entity.setProperty(CarRefuel.TOTAL_PRICE, dto.getTotalPrice());
-        entity.setProperty(CarRefuel.KILOMETERS, dto.getKilometers());
-        entity.setProperty(CarRefuel.DESCRIPTION, dto.getDescription());
-
+        dtoToEntity(dto, entity);
         Key key = datastoreService.put(entity);
+        log.info("QuestionAnswer created", dto);
         return key.getId();
     }
 
     public QuestionAnswer get(Long id) {
         try {
             Entity entity = datastoreService.get(KeyFactory.createKey(QA_KIND, id));
+            log.info("QuestionAnswer loaded", entity);
             return entityToDto(entity);
         } catch (EntityNotFoundException e) {
             return null;
@@ -64,18 +49,15 @@ public class QuestionAnswerDAOImpl implements QuestionAnswerDAO {
     public void update(QuestionAnswer dto) {
         Key key = KeyFactory.createKey(QA_KIND, dto.getId());
         Entity entity = new Entity(key);
-        entity.setProperty(CarRefuel.FUEL_PRICE_PER_LITER, dto.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.LITERS, dto.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.TOTAL_PRICE, dto.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.KILOMETERS, dto.getFuelPricePerLiter());
-        entity.setProperty(CarRefuel.DESCRIPTION, dto.getFuelPricePerLiter());
-
+        dtoToEntity(dto, entity);
         datastoreService.put(entity);
+        log.info("QuestionAnswer updated", dto);
     }
 
     public void delete(Long id) {
         Key key = KeyFactory.createKey(QA_KIND, id);
         datastoreService.delete(key);
+        log.info("QuestionAnswer deleted", id);
     }
 
     private List<QuestionAnswer> entitiesToDtos(Iterator<Entity> entityResults) {
@@ -92,7 +74,7 @@ public class QuestionAnswerDAOImpl implements QuestionAnswerDAO {
             fetchOptions.startCursor(Cursor.fromWebSafeString(startCursorString)); // Where we left off
         }
         Query query = new Query(QA_KIND)
-                .addSort(CarRefuel.KILOMETERS, Query.SortDirection.ASCENDING);
+                .addSort(QuestionAnswer.BOOK_CODE, Query.SortDirection.ASCENDING);
         PreparedQuery preparedQuery = datastoreService.prepare(query);
         QueryResultIterator<Entity> entityResults = preparedQuery.asQueryResultIterator(fetchOptions);
 
