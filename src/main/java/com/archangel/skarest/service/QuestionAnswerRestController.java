@@ -34,16 +34,8 @@ public class QuestionAnswerRestController {
     // CREATE
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<QuestionAnswer> create(@RequestBody QuestionAnswer dtoIn) {
-//        QuestionAnswer dtoOut = new QuestionAnswer.Builder()
-//                .bookCode(dtoIn.getBookCode())
-//                .fuelPricePerLiter(dtoIn.getFuelPricePerLiter())
-//                .totalPrice(dtoIn.getTotalPrice())
-//                .liters(dtoIn.getLiters())
-//                .description(dtoIn.getDescription())
-//                .build();
-
-        dao.create(dtoIn);
-
+        Long id = dao.create(dtoIn);
+        dtoIn.setId(id);
         return new ResponseEntity<>(dtoIn, HttpStatus.OK);
     }
 

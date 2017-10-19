@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MainResponseController {
 
-    @GetMapping("/")
+    @GetMapping("/test")
     public String indexResponse() {
         return "Ska-rest-service, springboot-appengine-standard, running...";
     }
