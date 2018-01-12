@@ -14,16 +14,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>1.5.7.RELEASE</spring.boot.version> <!-- DO NOT UPDATE w/o MANUAL TESTING -->
+        <spring.boot.version>1.5.9.RELEASE</spring.boot.version> <!-- DO NOT UPDATE w/o MANUAL TESTING -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <cloud.datastore.version>1.6.0</cloud.datastore.version>
-        <appengine.version>1.9.57</appengine.version>
+        <appengine.version>1.9.60</appengine.version>
         <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
         <maven.versions.plugin.version>2.4</maven.versions.plugin.version>
-        <appengine.maven.plugin.version>1.9.57</appengine.maven.plugin.version>
+        <appengine.maven.plugin.version>1.9.60</appengine.maven.plugin.version>
         <app.id>ska-rest</app.id>
         <app.version>${project.version}</app.version>
         <google.api.client.version>1.21.0</google.api.client.version>
