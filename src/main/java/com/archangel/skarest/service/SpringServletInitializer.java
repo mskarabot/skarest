@@ -2,7 +2,7 @@ package com.archangel.skarest.service;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 
-public class SpringServletInitializer extends org.springframework.boot.web.support.SpringBootServletInitializer {
+public class SpringServletInitializer extends org.springframework.boot.web.servlet.support.SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {

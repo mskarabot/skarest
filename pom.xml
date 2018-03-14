@@ -5,7 +5,7 @@
 
     <groupId>com.archangel.skarest</groupId>
     <artifactId>ska-rest-service</artifactId>
-    <version>1-snapshot</version>
+    <version>2</version>
     <packaging>war</packaging>
 
     <name>ska-rest-service</name>
@@ -14,21 +14,30 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring.boot.version>1.5.9.RELEASE</spring.boot.version> <!-- DO NOT UPDATE w/o MANUAL TESTING -->
+        <spring.boot.version>2.0.0.RELEASE</spring.boot.version> <!-- DO NOT UPDATE w/o MANUAL TESTING -->
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <cloud.datastore.version>1.6.0</cloud.datastore.version>
-        <appengine.version>1.9.60</appengine.version>
-        <javax.servlet.api.version>3.1.0</javax.servlet.api.version>
+        <cloud.datastore.version>1.20.0</cloud.datastore.version>
+        <appengine.version>1.9.63</appengine.version>
+        <javax.servlet.api.version>4.0.0</javax.servlet.api.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
         <maven.versions.plugin.version>2.4</maven.versions.plugin.version>
-        <appengine.maven.plugin.version>1.9.60</appengine.maven.plugin.version>
+        <appengine.maven.plugin.version>1.9.63</appengine.maven.plugin.version>
         <app.id>ska-rest</app.id>
         <app.version>${project.version}</app.version>
-        <google.api.client.version>1.21.0</google.api.client.version>
-        <google.oauth.client.jetty.version>1.21.0</google.oauth.client.jetty.version>
-        <google.api.services.sheets>v4-rev485-1.21.0</google.api.services.sheets>
+        <google.api.client.version>1.23.0</google.api.client.version>
+        <google.oauth.client.jetty.version>1.23.0</google.oauth.client.jetty.version>
+        <google.api.services.sheets>v4-rev510-1.23.0</google.api.services.sheets>
+        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
+        <maven-install-plugin.version>2.5.2</maven-install-plugin.version>
+        <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+        <maven-site-plugin.version>3.6</maven-site-plugin.version>
+        <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-enforcer-plugin.version>3.0.0-M1</maven-enforcer-plugin.version>
+        <maven-enforcer-plugin-maven-version.version>3.5</maven-enforcer-plugin-maven-version.version>
     </properties>
 
     <dependencies>
@@ -181,71 +190,74 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-<!--
+
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <version>${maven-compiler-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>${maven-clean-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>${maven-install-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
+                <version>${maven-surefire-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.6</version>
+                <version>${maven-site-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>${maven-resources-plugin.version}</version>
             </plugin>
 
             <plugin>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
+                <version>${maven-deploy-plugin.version}</version>
             </plugin>
-            -->
-<!--
+
+
             <plugin>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <version>${maven-enforcer-plugin.version}</version>
+                <configuration>
+                    <rules>
+                        <requireMavenVersion>
+                            <version>${maven-enforcer-plugin-maven-version.version}</version>
+                        </requireMavenVersion>
+                        <requirePluginVersions>
+                            <message>Best Practice is to always define plugin versions!</message>
+                            <banLatest>true</banLatest>
+                            <banRelease>true</banRelease>
+                            <phases>
+                                clean,deploy,verify,appengine:run,appengine:deploy,appengine:update,appengine:devappaserver,site
+                            </phases>
+                        </requirePluginVersions>
+                        <requireJavaVersion>
+                            <version>1.8</version>
+                        </requireJavaVersion>
+                    </rules>
+                </configuration>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.5</version>
-                                </requireMavenVersion>
-                                <requirePluginVersions>
-                                    <message>Best Practice is to always define plugin versions!</message>
-                                    <banLatest>true</banLatest>
-                                    <banRelease>true</banRelease>
-                                    <phases>
-                                        clean,deploy,verify,appengine:run,appengine:deploy,appengine:update,appengine:devappaserver,site
-                                    </phases>
-                                </requirePluginVersions>
-                            </rules>
-                        </configuration>
+
                     </execution>
                 </executions>
             </plugin>
-            -->
             <!-- [END_EXCLUDE] -->
 
 
